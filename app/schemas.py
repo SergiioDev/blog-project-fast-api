@@ -30,6 +30,10 @@ class UserCreate(UserBase):
     pass
 
 
+class UserUpdate(UserBase):
+    email: EmailStr
+
+
 class UserResponse(BaseModel):
     id: int
     email: EmailStr

@@ -11,14 +11,16 @@ router = APIRouter(
 
 
 @router.get("/", response_model=List[schemas.PostResponse])
-def get_posts(db: Session = Depends(get_db), curent_user_id: int = Depends(oauth2.get_current_user)):
+def get_posts(db: Session = Depends(get_db), current_user: models.User = Depends(oauth2.get_current_user)):
     posts = db.query(models.Post).all()
     return posts
 
 
 @router.post("/", status_code=status.HTTP_201_CREATED, response_model=schemas.PostResponse)
-def create_posts(post: schemas.PostCreate, db: Session = Depends(get_db), curent_user_id: int = Depends(oauth2.get_current_user)):
-    post = models.Post(**post.dict())
+def create_posts(post: schemas.PostCreate, db: Session = Depends(get_db),
+                 curent_user: models.User = Depends(oauth2.get_current_user)):
+
+    post = models.Post(owner_id=curent_user.id, **post.dict())
     db.add(post)
     db.commit()
     db.refresh(post)
@@ -26,7 +28,7 @@ def create_posts(post: schemas.PostCreate, db: Session = Depends(get_db), curent
 
 
 @router.get("/{post_id}", response_model=schemas.PostResponse)
-def get_post(post_id: int, db: Session = Depends(get_db), curent_user_id: int = Depends(oauth2.get_current_user)):
+def get_post(post_id: int, db: Session = Depends(get_db), curent_user_id: models.User = Depends(oauth2.get_current_user)):
     post = db.query(models.Post).filter(models.Post.id == post_id).first()
 
     if not post:
@@ -36,7 +38,8 @@ def get_post(post_id: int, db: Session = Depends(get_db), curent_user_id: int = 
 
 
 @router.put("{post_id}", response_model=schemas.PostResponse)
-def update_post(post_id: int, post: schemas.PostCreate, db: Session = Depends(get_db), curent_user_id: int = Depends(oauth2.get_current_user)):
+def update_post(post_id: int, post: schemas.PostCreate, db: Session = Depends(get_db),
+                curent_user_id: models.User = Depends(oauth2.get_current_user)):
     post_query = db.query(models.Post).filter(models.Post.id == post_id)
 
     if not post_query.first():
@@ -49,7 +52,7 @@ def update_post(post_id: int, post: schemas.PostCreate, db: Session = Depends(ge
 
 
 @router.delete("/{post_id}", status_code=status.HTTP_204_NO_CONTENT)
-def delete_post(post_id: int, db: Session = Depends(get_db), curent_user_id: int = Depends(oauth2.get_current_user)):
+def delete_post(post_id: int, db: Session = Depends(get_db), curent_user_id: models.User = Depends(oauth2.get_current_user)):
     post_query = db.query(models.Post).filter(models.Post.id == post_id)
 
     if not post_query.first():

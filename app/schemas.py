@@ -1,3 +1,5 @@
+from typing import Optional
+
 from pydantic import BaseModel, EmailStr
 
 
@@ -34,9 +36,22 @@ class UserUpdate(UserBase):
     email: EmailStr
 
 
+class UserLogin(UserBase):
+    pass
+
+
 class UserResponse(BaseModel):
     id: int
     email: EmailStr
 
     class Config:
         orm_mode = True
+
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str
+
+
+class TokenData(BaseModel):
+    id: Optional[str]

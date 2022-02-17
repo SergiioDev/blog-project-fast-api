@@ -39,11 +39,14 @@ def get_post(post_id: int, db: Session = Depends(get_db), curent_user_id: models
 
 @router.put("{post_id}", response_model=schemas.PostResponse)
 def update_post(post_id: int, post: schemas.PostCreate, db: Session = Depends(get_db),
-                curent_user_id: models.User = Depends(oauth2.get_current_user)):
+                curent_user: models.User = Depends(oauth2.get_current_user)):
     post_query = db.query(models.Post).filter(models.Post.id == post_id)
 
     if not post_query.first():
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"post with id {post_id} does not exists")
+
+    if post_query.owner_id != curent_user.id:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="you're not the owner of this post")
 
     post_query.update(post.dict(), synchronize_session=False)
 
@@ -52,11 +55,15 @@ def update_post(post_id: int, post: schemas.PostCreate, db: Session = Depends(ge
 
 
 @router.delete("/{post_id}", status_code=status.HTTP_204_NO_CONTENT)
-def delete_post(post_id: int, db: Session = Depends(get_db), curent_user_id: models.User = Depends(oauth2.get_current_user)):
+def delete_post(post_id: int, db: Session = Depends(get_db), curent_user: models.User = Depends(oauth2.get_current_user)):
     post_query = db.query(models.Post).filter(models.Post.id == post_id)
+    post = post_query.first()
 
-    if not post_query.first():
+    if not post:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"post with id {post_id} does not exists")
+
+    if post.owner_id != curent_user.id:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="you're not the owner of this post")
 
     post_query.delete(synchronize_session=False)
     db.commit()

@@ -3,8 +3,8 @@ Description=fastapi blog application
 After=network.target
 
 [Service]
-User=sanjeev
-Group=sanjeev
+User=ubuntu
+Group=ubuntu
 WorkingDirectory=/home/ubuntu/blog-backend/src/
 Environment="PATH=/home/ubuntu/blog-backend/venv/bin"
 EnvironmentFile=/home/ubuntu/.env

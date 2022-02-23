@@ -1,0 +1,14 @@
+[Unit]
+Description=fastapi blog application
+After=network.target
+
+[Service]
+User=sanjeev
+Group=sanjeev
+WorkingDirectory=/home/ubuntu/blog-backend/src/
+Environment="PATH=/home/ubuntu/blog-backend/venv/bin"
+EnvironmentFile=/home/ubuntu/.env
+ExecStart=/home/ubuntu/blog-backend/venv/bin/gunicorn -w 4 -k uvicorn.workers.UvicornWorker app.main:app --bind 0.0.0.0:8000
+
+[Install]
+WantedBy=multi-user.target

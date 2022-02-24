@@ -40,8 +40,13 @@ class PostBase(BaseModel):
         orm_mode = True
 
 
-class PostCreate(PostBase):
-    pass
+class PostCreate(BaseModel):
+    title: str
+    content: str
+    published: bool = True
+
+    class Config:
+        orm_mode = True
 
 
 class PostResponse(BaseModel):

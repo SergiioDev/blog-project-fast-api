@@ -22,13 +22,14 @@ def get_posts(db: Session = Depends(get_db), current_user: models.User = Depends
     return posts_with_likes
 
 
-@router.post("/", status_code=status.HTTP_201_CREATED, response_model=schemas.PostResponse)
+@router.post("/", status_code=status.HTTP_201_CREATED, response_model=schemas.PostCreate)
 def create_posts(post: schemas.PostCreate, db: Session = Depends(get_db),
                  curent_user: models.User = Depends(oauth2.get_current_user)):
     post = models.Post(owner_id=curent_user.id, **post.dict())
     db.add(post)
     db.commit()
     db.refresh(post)
+    print(post.owner_id)
     return post
 
 

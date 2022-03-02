@@ -5,7 +5,7 @@ services:
     depends_on:
       - postgres
     ports:
-      - "8000:8000"
+      - "80:8000"
     volumes:
       - ./:/blog-backend/src/app
     env_file:
@@ -19,7 +19,6 @@ services:
       - SECRET_KEY=${SECRET_KEY}
       - ALGORITHM=${ALGORITHM}
       - ACCESS_TOKEN_EXPIRE_MINUTES=${ACCESS_TOKEN_EXPIRE_MINUTES}
-    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
   postgres:
     image: postgres
     env_file:

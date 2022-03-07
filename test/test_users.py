@@ -26,3 +26,4 @@ def test_incorrect_login(test_user, client):
                            data={"username": test_user['email'], "password": "incorrect"})
 
     assert response.status_code == 403
+    assert response.json() == {"detail": "Wrong password"}

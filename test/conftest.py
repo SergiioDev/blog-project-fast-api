@@ -45,5 +45,20 @@ def test_user(client):
 
     response = client.post("/users/", json=user_data)
 
+    user_data['id'] = 1
     assert response.status_code == 201
     return user_data
+
+
+@pytest.fixture
+def token(test_user):
+    return create_access_token({"user_id": test_user['id']})
+
+
+@pytest.fixture
+def authorized_client(client, token):
+    client.headers = {
+        **client.headers,
+        "Authorization": f"Bearer {token}"
+    }
+    return client

@@ -1,11 +1,20 @@
+from fastapi.testclient import TestClient
 import pytest
-from starlette.testclient import TestClient
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy.ext.declarative import declarative_base
 from app.main import app
 from app.config import settings
 from app.database import get_db
 from app.database import Base
 from .database import engine
+from .database import SQLALCHEMY_DATABASE_URL
 from .database import TestingSessionLocal
+from app.oauth2 import create_access_token
+from app import models
+from alembic import command
+
+
 @pytest.fixture
 def session():
     Base.metadata.drop_all(bind=engine)
@@ -28,3 +37,13 @@ def client(session):
 
     app.dependency_overrides[get_db] = override_get_db
     yield TestClient(app)
+
+
+@pytest.fixture
+def test_user(client):
+    user_data = {"email": "unitTest@unit.com", "password": "unit"}
+
+    response = client.post("/users/", json=user_data)
+
+    assert response.status_code == 201
+    return user_data

@@ -10,14 +10,19 @@ def test_create_user(client):
     assert response.json() == {"id": 1, "email": "unitTest@unit.com"}
 
 
-def test_login(client):
-    client.post("/users/",
-                json={"email": "unitTest@unit.com", "password": "unit"})
-
+def test_login(test_user,client):
     response = client.post("/login",
-                           data={"username": "unitTest@unit.com", "password": "unit"})
+                           data={"username": test_user['email'], "password": test_user['password']})
 
     token = schemas.Token(**response.json())
 
     assert response.status_code == 200
     assert token.token_type == "bearer"
+
+
+def test_incorrect_login(test_user, client):
+
+    response = client.post("/login",
+                           data={"username": test_user['email'], "password": "incorrect"})
+
+    assert response.status_code == 403

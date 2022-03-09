@@ -62,3 +62,34 @@ def authorized_client(client, token):
         "Authorization": f"Bearer {token}"
     }
     return client
+
+
+@pytest.fixture
+def test_post(test_user, session):
+    post_data = [
+        {
+            "title": "first post",
+            "content": "first post content",
+            "owner_id": 1
+        },
+        {
+            "title": "second post",
+            "content": "second post content",
+            "owner_id": 1
+        },
+        {
+            "title": "third post",
+            "content": "third post content",
+            "owner_id": 1
+        }
+    ]
+
+    def create_post_model(post):
+        return models.Post(**post)
+
+    post_map = map(create_post_model, post_data)
+    posts = list(post_map)
+
+    session.add_all(posts)
+    session.commit()
+    return session.query(models.Post).all()
